@@ -46,10 +46,10 @@ ADL structs and unions:
     };
 ```
 
-produce java classes [Rectangle.java][rect-java] and
-[Picture.java][pic-java]. The code for ADL structs follows standard
-java conventions: private members, accessors, mutators, hashCode() and
-equals(), etc.
+produce java classes (see [Rectangle.java][rect-java],
+[Picture.java][pic-java]). The code for ADL structs follows standard
+java conventions: private members, accessors, mutators, `hashCode()` and
+`equals()`, etc.
 
 Given the lack of sum types in java, for unions the ADL compiler
 generates a class with a discriminator enum member, and accessors and
