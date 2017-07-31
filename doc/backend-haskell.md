@@ -15,7 +15,7 @@ Usage: adl haskell [OPTION...] files...
 # Generated Code
 
 The haskell backend generates haskell code from the input ADL
-files. Each ADL module results gnerates a single corresponding haskell
+files. Each ADL module results generates a single corresponding haskell
 module. The `--package` compiler flag specified the root package for
 generate code. Hence, an adl module `foo.bar` with the compile flag
 `--package project1.adl` would result in the haskell module
@@ -136,6 +136,12 @@ The runtime itself depends on the following haskell packages:
 * vector
 
 ie the transitive dependencies of the aeson package.
+
+# Annotations
+
+The haskell backend merges annotations from files with an `.adl-hs`
+suffix: eg when loading `demo/model.adl` it will automatically merge
+`demo/model.adl-hs` if found.
 
 # Custom types
 
