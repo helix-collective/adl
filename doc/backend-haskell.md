@@ -15,8 +15,8 @@ Usage: adl haskell [OPTION...] files...
 # Generated Code
 
 The haskell backend generates haskell code from the input ADL
-files. Each ADL module results generates a single corresponding haskell
-module. The `--package` compiler flag specified the root package for
+files. Each ADL module results in a single corresponding haskell
+module. The `--package` compiler flag specifies the root package for
 generate code. Hence, an adl module `foo.bar` with the compile flag
 `--package project1.adl` would result in the haskell module
 `project1.adl.foo.bar`.
@@ -85,18 +85,18 @@ class AdlValue a where
 
 The ADL primitive types are mapped to haskell types as follows:
 
-| ADL Type                   | Haskell Type               |
-|----------------------------|----------------------------|
-| Int8,Int16,Int32,Int64     | Int8,Int16,Int32,Int64     |
-| Word8,Word16,Word32,Word64 | Word8,Word16,Word32,Word64 |
-| Bool                       | Bool                       |
-| Void                       | ()                         |
-| Float,Double               | Float,Double               |
-| String                     | Data.Text                  |
-| ByteVector                 | Data.ByteString            |
-| `Vector<T>`                | [t]                        |
-| `StringMap<T>`             | Data.Map Data.Text t       |
-| `Nullable<T>`              | Maybe t                    |
+| ADL Type                     | Haskell Type                 |
+|------------------------------|------------------------------|
+| `Int8,Int16,Int32,Int64`     | `Int8,Int16,Int32,Int64`     |
+| `Word8,Word16,Word32,Word64` | `Word8,Word16,Word32,Word64` |
+| `Bool`                       | `Bool`                       |
+| `Void`                       | `()`                         |
+| `Float,Double`               | `Float,Double`               |
+| `String`                     | `Data.Text`                  |
+| `ByteVector`                 | `Data.ByteString`            |
+| `Vector<T>`                  | `[t]`                        |
+| `StringMap<T>`               | `Data.Map Data.Text t`       |
+| `Nullable<T>`                | `Maybe t`                    |
 
 # Runtime
 
