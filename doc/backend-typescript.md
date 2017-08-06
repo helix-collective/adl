@@ -59,7 +59,7 @@ representation can be processed generically to implement serialization
 and potentially many other capabilities. For each ADL type T, the
 typescript backend will also generate:
 
-* an ast representation (a value of type [ScopedDecl][ts-scopeddecl])
+* an ast representation (as a value of type [ScopedDecl][ts-scopeddecl])
 * a type expression function (returning a value of type [ATypeExpr<T>][ts-atypeexpr])
 
 Together with a standard [`DeclResolver`][ts-declresolver] interface,
@@ -100,4 +100,4 @@ This approach works for arbitrary ADL Types, including generics.
 [ts-scopeddecl]:../adl/stdlib/sys/adlast.adl#L93
 [ts-atypeexpr]:../haskell/compiler/lib/typescript/runtime/adl.ts#5
 [ts-declresolver]:../haskell/compiler/lib/typescript/runtime/adl.ts#10
-[[ts-json]:../haskell/compiler/lib/typescript/runtime/json.ts
+[ts-json]:../haskell/compiler/lib/typescript/runtime/json.ts
