@@ -11,6 +11,7 @@ code generators for several target languages, and runtimes for these languages.
 * Language support:
     * [haskell][]
     * [java][]
+    * [typescript][]
 * [install][] - installation instructions
 
 [introduction]:doc/introduction.md
@@ -19,4 +20,5 @@ code generators for several target languages, and runtimes for these languages.
 [serialization]:doc/serialization.md
 [install]:doc/install.md
 [haskell]:doc/backend-haskell.md
+[typescript]:doc/backend-typescript.md
 [java]:doc/backend-java.md
