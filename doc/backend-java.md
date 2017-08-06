@@ -139,11 +139,10 @@ suffix: eg when loading `demo/model.adl` it will automatically merge
 Any `Doc` annotations (which can also be specified using `///`
 comments), are included as comments in the generated java code.
 
-Generated java code is normally with it's root package specified by
-the `--package` command line flag. The
-[`JavaPackage`][java-annotations] module annotation can be used to
-control the root package for individual adl modules. For example, this
-declaration
+Generated java code normally has its root package specified by the
+`--package` command line flag. The [`JavaPackage`][java-annotations]
+module annotation can be used to control the root package for
+individual adl modules. For example, this declaration
 
 ```
 @JavaPackage "com.mycompany.adl"

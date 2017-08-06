@@ -6,6 +6,7 @@ code generators for several target languages, and runtimes for these languages.
 
 * [introduction][] - an overview of the ADL system
 * [language][] - a description of the ADL language
+* [compiler][] - the command line compiler
 * [serialization][] - how ADL types are serialized
 * Language support:
     * [haskell][]
@@ -14,7 +15,8 @@ code generators for several target languages, and runtimes for these languages.
 
 [introduction]:doc/introduction.md
 [language]:doc/language.md
+[compiler]:doc/compiler.md
 [serialization]:doc/serialization.md
 [install]:doc/install.md
 [haskell]:doc/backend-haskell.md
-[haskell]:doc/backend-java.md
+[java]:doc/backend-java.md
