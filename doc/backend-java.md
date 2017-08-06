@@ -1,7 +1,7 @@
 # ADL java backend
 
 ```
-Usage: adl java [OPTION...] files...
+Usage: adlc java [OPTION...] files...
   -I DIR  --searchdir=DIR            Add the specifed directory to the ADL searchpath
   -O DIR  --outputdir=DIR            Set the directory where generated code is written
           --merge-adlext=EXT         Add the specifed adl file extension to merged on loading
@@ -23,10 +23,10 @@ The java backend generates java code from the input ADL files. Each
 ADL module results in a java package - individual ADL declarations
 will produce a source file inside that package.
 
-The `--package` compiler flag specified the root package for generated
-java code. Hence, an adl declaration for `SomeStruct` module `foo.bar`
-with the compile flag `--package project1.adl` would result in the
-java source file `project1/adl/foo/bar/SomeStruct.java`.
+The `--package` compiler flag specifies the root package for generated
+java code. Hence, an adl declaration for `SomeStruct` in module
+`foo.bar` with the compile flag `--package project1.adl` would result
+in the java class `project1.adl.foo.bar.SomeStruct`.
 
 ADL structs and unions:
 
@@ -51,23 +51,23 @@ produce java classes (see [Rectangle.java][rect-java],
 java conventions: private members, accessors, mutators, `hashCode()` and
 `equals()`, etc.
 
-Given the lack of sum types in java, for unions the ADL compiler
-generates a class with a discriminator enum member, and accessors and
-static constructors for each union field. The accessors will throw an
+Given the lack of sum types in java, ADL unions are compiled to a
+class with a enum discriminator member, and accessors and static
+constructors for each union field. The accessors will throw an
 `IllegalStateException` if they are called for a field that doesn't
 match the current discriminator value.
 
 ADL newtypes are translated to java classes with a single member
 variable. ADL type aliases are eliminated in the generated java code
-by substution.
+by substitution.
 
 Each generated java class includes static helpers to
 construct:
 
-* a [`Factory`][fact-java] for deep coping values and also
+* a [`Factory`][java-factory] for deep coping values and also
 for runtime type information.
 
-* a [`JsonBinding`][jb-java] for json serialization
+* a [`JsonBinding`][java-jsonbinding] for json serialization
 
 # Primitive Types
 
@@ -86,7 +86,9 @@ The ADL primitive types are mapped to java types as follows:
 | `StringMap<T>`               | `java.util.HashMap<String,t>` |
 | `Nullable<T>`                | `java.util.Optional<T>`       |
 
-Where possible, unboxed primitive values will be used.
+The generated adl will use unboxed primitives where possible,
+reverting to boxed primitives when necessary (ie `int` vs `Int`).
+
 
 # Runtime
 
@@ -98,7 +100,7 @@ flag is specified, the adl compiler will also output the runtime code.
 As a concrete example, if the adl compiler is called like this:
 
 ```
-adlc java\
+adlc java \
   --outputdir src \
   --package adl \
   --json \
@@ -210,8 +212,6 @@ declarations in the [adl standard library][stdlib]:
 
 [rect-java]:../haskell/compiler/tests/demo1/java-output/adl/picture/Rectangle.java
 [pic-java]:..//haskell/compiler/tests/demo1/java-output/adl/picture/Picture.java
-[fact-java]:../java/runtime/src/main/java/org/adl/runtime/Factory.java
-[jb-java]:../java/runtime/src/main/java/org/adl/runtime/JsonBinding.java
 [java-localdate]:https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
 [java-annotations]:../haskell/compiler/lib/adl/adlc/config/java.adl
 [java-datehelpers]:../haskell/compiler/tests/test4/input/java/helpers/DateHelpers.java

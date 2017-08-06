@@ -1,7 +1,7 @@
 # ADL haskell backend
 
 ```
-Usage: adl haskell [OPTION...] files...
+Usage: adlc haskell [OPTION...] files...
   -I DIR  --searchdir=DIR      Add the specifed directory to the ADL searchpath
   -O DIR  --outputdir=DIR      Set the directory where generated code is written
           --merge-adlext=EXT   Add the specifed adl file extension to merged on loading

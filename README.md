@@ -9,6 +9,7 @@ code generators for several target languages, and runtimes for these languages.
 * [serialization][] - how ADL types are serialized
 * Language support:
     * [haskell][]
+    * [java][]
 * [install][] - installation instructions
 
 [introduction]:doc/introduction.md
@@ -16,3 +17,4 @@ code generators for several target languages, and runtimes for these languages.
 [serialization]:doc/serialization.md
 [install]:doc/install.md
 [haskell]:doc/backend-haskell.md
+[haskell]:doc/backend-java.md
