@@ -69,11 +69,6 @@ for runtime type information.
 
 * a [`JsonBinding`][jb-java] for json serialization
 
-[rect-java]:../haskell/compiler/tests/demo1/java-output/adl/picture/Rectangle.java
-[pic-java]:..//haskell/compiler/tests/demo1/java-output/adl/picture/Picture.java
-[fact-java]:../java/runtime/src/main/java/org/adl/runtime/Factory.java
-[jb-java]:../java/runtime/src/main/java/org/adl/runtime/JsonBinding.java
-
 # Primitive Types
 
 The ADL primitive types are mapped to java types as follows:
@@ -141,3 +136,85 @@ suffix: eg when loading `demo/model.adl` it will automatically merge
 
 Any `Doc` annotations (which can also be specified using `///`
 comments), are included as comments in the generated java code.
+
+Generated java code is normally with it's root package specified by
+the `--package` command line flag. The
+[`JavaPackage`][java-annotations] module annotation can be used to
+control the root package for individual adl modules. For example, this
+declaration
+
+```
+@JavaPackage "com.mycompany.adl"
+module api.rest
+{
+...
+};
+```
+
+would result in java classes being generated in package
+`com.mycompany.adl.api.rest`.
+
+# Custom types
+
+When a type is defined in ADL, a (language independent) serialisation
+specification is implied. Running the compiler with a given language
+target will generate definitions for that type, as well the necessary
+serialisation code.  However, often one would like to use an
+equivalent existing type, for compatibility with other code. Custom
+types make this possible.
+
+As an example, consider a date type. There is no primitive in the ADL
+language for dates, so we need to define one. A possible ADL definition is:
+
+```
+newtype Date = String;   // dates are serialised as ISO-8601 strings.
+```
+
+This would normally result in a generated java class. We'd prefer
+instead to use the java [`LocalDate`][java-localdate] type throughout
+the ADL. The can be done with a [`JavaCustomType`][java-annotations]
+annotation:
+
+```
+annotation Date JavaCustomType {
+  "javaname" : "java.time.LocalDate",
+  "helpers" : "helpers.DateHelpers",
+  "generateType" : false
+  };
+```
+
+The `javaname` property gives the fully scoped name of the type to be
+used (ie `LocalDate`). The `helpers` property gives the fully scoped
+name of a user provided class containing static helper functions
+required to adapt the `LocalDate` class to the adl system (eg
+[`helpers.DateHelpers`][java-datehelpers]). These must provide:
+
+* A `create` function to construct literal values
+* An instance of the [`Factory`][java-factory] interface
+* An instance of the [`JsonBinding`][java-jsonbinding] interface
+
+The `generateTypeProperty` controls whether the standard ADL generated
+code is still emitted (even though it will be unreferenced). This can
+be useful in the implementation of the custom type.
+
+## Standard Custom Types
+
+There are predefined java custom type mappings for the following
+declarations in the [adl standard library][stdlib]:
+
+| ADL Type           | Java Type          |
+|--------------------|--------------------|
+| sys.types.Map<K,V> | java.util.HashMap  |
+| sys.types.Set<V>   | java.util.HashSet  |
+| sys.types.Maybe<T> | java.util.Optional |
+
+[rect-java]:../haskell/compiler/tests/demo1/java-output/adl/picture/Rectangle.java
+[pic-java]:..//haskell/compiler/tests/demo1/java-output/adl/picture/Picture.java
+[fact-java]:../java/runtime/src/main/java/org/adl/runtime/Factory.java
+[jb-java]:../java/runtime/src/main/java/org/adl/runtime/JsonBinding.java
+[java-localdate]:https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
+[java-annotations]:../haskell/compiler/lib/adl/adlc/config/java.adl
+[java-datehelpers]:../haskell/compiler/tests/test4/input/java/helpers/DateHelpers.java
+[java-factory]:../java/runtime/src/main/java/org/adl/runtime/Factory.java
+[java-jsonbinding]:../java/runtime/src/main/java/org/adl/runtime/JsonBinding.java
+[stdlib]:../adl/stdlib
