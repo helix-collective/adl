@@ -165,6 +165,12 @@ library
                     , ADL.Compiler.Backends.Typescript.Internal
                     , ADL.Compiler.Backends.Rust
                     , ADL.Compiler.Backends.Rust.Internal
+                    , ADL.Compiler.Backends.JavaTables
+                    , ADL.Compiler.Backends.JavaTables.Schema
+                    , ADL.Compiler.Backends.JavaTables.SchemaUtils
+                    , ADL.Compiler.Backends.JavaTables.JavaUtils
+                    , ADL.Compiler.Backends.JavaTables.V1
+                    , ADL.Compiler.Backends.JavaTables.V2
                     , ADL.Compiler.DataFiles
                     , ADL.Adlc.Config.Cpp
                     , ADL.Adlc.Config.Haskell

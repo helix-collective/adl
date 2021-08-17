@@ -9,6 +9,7 @@ import qualified ADL.Compiler.Backends.Java as J
 import qualified ADL.Compiler.Backends.Javascript as JS
 import qualified ADL.Compiler.Backends.Typescript as TS
 import qualified ADL.Compiler.Backends.Rust as RS
+import qualified ADL.Compiler.Backends.JavaTables as JT
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Paths_adl_compiler as P
@@ -335,6 +336,7 @@ usage = T.intercalate "\n"
   , "       adlc haskell [OPTION..] <modulePath>..."
   , "       adlc cpp [OPTION..] <modulePath>..."
   , "       adlc java [OPTION..] <modulePath>..."
+  , "       adlc java-tables [OPTION..] <modulePath>..."
   , "       adlc javascript [OPTION..] <modulePath>..."
   , "       adlc typescript [OPTION..] <modulePath>..."
   , "       adlc rust [OPTION..] <modulePath>..."
@@ -350,6 +352,7 @@ main = do
     ("ast":args) -> runAst args
     ("cpp":args) -> runCpp args
     ("java":args) -> runJava args
+    ("java-tables":args) -> JT.generateJavaTables args
     ("javascript":args) -> runJavascript args
     ("typescript":args) -> runTypescript args
     ("rust":args) -> runRust args
