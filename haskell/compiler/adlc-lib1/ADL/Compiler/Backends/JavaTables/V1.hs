@@ -25,7 +25,7 @@ import ADL.Compiler.Backends.JavaTables.JavaUtils
 import ADL.Compiler.Backends.JavaTables.V2
 import ADL.Utils.IndentedCode
 import ADL.Utils.Format(template,formatText)
-import Control.Monad(when)
+import Control.Monad(when, mplus)
 import Control.Monad.Trans(liftIO)
 import Control.Monad.Trans.State.Strict
 import Data.Char(toUpper, isUpper)
@@ -346,16 +346,16 @@ dbFromAdlExpr col field expr = do
 
 
 -- match structs that are annotated to be
--- database tables
+-- database tables or views
 matchDBTable :: SC.Schema -> J.CDecl -> Maybe (J.CDecl,AST.Struct J.CResolvedType,SC.Table,JS.Value, Maybe GenVersion)
-matchDBTable schema decl = case AST.d_type decl of
-  (AST.Decl_Struct struct) ->
-    case getAnnotation (AST.d_annotations decl) dbTableType of
-      Nothing -> Nothing
-      (Just annotation) -> case find (\t -> SC.table_name t == dbTableName decl) (SC.schema_tables schema) of
-        Nothing -> error ("Can't find schema table for oth" <> T.unpack (dbTableName decl))
-        Just table -> case getAnnotation (AST.d_annotations decl) javaDbTableVersion of
-           (Just (JS.String t)) -> Just (decl,struct,table,annotation, (Just (decodeVersion (T.unpack t))))
-           Nothing -> Just (decl,struct,table,annotation, Nothing)
-
-  _ -> Nothing
+matchDBTable schema decl = do
+  struct <- declStruct decl
+  annotation <- getAnnotation (AST.d_annotations decl) dbTableType `mplus` getAnnotation (AST.d_annotations decl) dbViewType
+  table <- find (\t -> SC.table_name t == dbTableName decl) (SC.schema_tables schema) 
+  case getAnnotation (AST.d_annotations decl) javaDbTableVersion of
+    (Just (JS.String t)) -> return (decl,struct,table,annotation, (Just (decodeVersion (T.unpack t))))
+    Nothing -> return (decl,struct,table,annotation, Nothing)
+  where
+    declStruct decl = case AST.d_type decl of
+      (AST.Decl_Struct struct) -> Just struct
+      _ -> Nothing

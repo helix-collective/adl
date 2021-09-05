@@ -312,8 +312,10 @@ matchDBTable :: RDecl -> Maybe DBTable
 matchDBTable decl = case d_type decl of
   (Decl_Struct struct) ->
     case getAnnotation (d_annotations decl) dbTableType of
-      Nothing -> Nothing
       (Just annotation) -> Just (decl,struct,annotation)
+      Nothing -> case getAnnotation (d_annotations decl) dbViewType of
+        (Just annotation) -> Just (decl,struct,annotation)
+        Nothing -> Nothing
   _ -> Nothing
 
 getAnnotation :: Annotations (ResolvedTypeT c)-> ScopedName -> Maybe JS.Value
@@ -371,6 +373,7 @@ toSnakeCase = useLazy (TL.intercalate "_" . words)
     in (TL.toLower (uc <> nuc), t2)
 
 dbTableType = ScopedName (ModuleName ["common","db"]) "DbTable"
+dbViewType = ScopedName (ModuleName ["common","db"]) "DbView"
 dbColumnNameType = ScopedName (ModuleName ["common","db"]) "DbColumnName"
 dbColumnTypeType = ScopedName (ModuleName ["common","db"]) "DbColumnType"
 dbKeyType = ScopedName (ModuleName ["common","db"]) "DbKey"

@@ -10,6 +10,8 @@ import qualified ADL.Compiler.Backends.JavaTables.SchemaUtils as SC
 import qualified ADL.Compiler.Backends.JavaTables.Schema as SC
 import qualified ADL.Compiler.Backends.Java.Internal as J
 import qualified ADL.Compiler.Backends.Java as J
+import Control.Monad(mplus)
+import Data.Maybe(fromMaybe)
 
 import ADL.Compiler.Processing
 
@@ -45,11 +47,15 @@ withCommas [l] = [(l," ")]
 withCommas (l:ls) = (l,","):withCommas ls
 
 dbTableName :: J.CDecl -> T.Text
-dbTableName decl = case getAnnotation (AST.d_annotations decl) dbTableType of
-  (Just (JS.Object hm)) -> case HM.lookup "tableName" hm of
-    (Just (JS.String t)) -> t
-    _ -> dbName (AST.d_name decl)
-  _ -> dbName (AST.d_name decl)
+dbTableName decl = fromMaybe (dbName (AST.d_name decl)) (tname decl `mplus` vname decl)
+  where
+  tname decl = annStringField dbTableType "tableName" decl
+  vname decl = annStringField dbViewType "viewName" decl
+  annStringField annType field decl = case getAnnotation (AST.d_annotations decl) annType of
+    (Just (JS.Object hm)) -> case HM.lookup field hm of
+      (Just (JS.String t)) -> Just t
+      _ -> Nothing
+    _ -> Nothing
 
 getAnnotation :: AST.Annotations J.CResolvedType -> AST.ScopedName -> Maybe JS.Value
 getAnnotation annotations annotationName = snd <$> M.lookup annotationName annotations
@@ -62,6 +68,7 @@ getAnnotationField (JS.Object hm) field = HM.lookup field hm
 getAnnotationField _ _ = Nothing
 
 dbTableType = AST.ScopedName (AST.ModuleName ["common","db"]) "DbTable"
+dbViewType = AST.ScopedName (AST.ModuleName ["common","db"]) "DbView"
 javaDbTableVersion = AST.ScopedName (AST.ModuleName ["common","db"]) "JavaDbTableVersion"
 javaDbCustomType = AST.ScopedName (AST.ModuleName ["common","db"]) "JavaDbCustomType"
 withDbIdType = AST.ScopedName (AST.ModuleName ["common","db"]) "WithDbId"
