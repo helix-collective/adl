@@ -26,9 +26,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.stack
-          key: ${{ runner.os }}-2-${{ hashFiles('haskell/stack.yaml') }}
+          key: ${{ runner.os }}-3-${{ hashFiles('haskell/stack.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-2
+            ${{ runner.os }}-3
 
       - name: Build compiler and generate zip
         run: "cd haskell; stack build adl-compiler; ./tools/make-dist.hs"
