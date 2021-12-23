@@ -172,7 +172,7 @@ generateClassCommon dbtable  = do
   let (tableClassNameT,tableInstanceNameT,javaClassNameT,dbTableNameT) = mkNames dbtable
 
   rtPackage <- J.getRuntimePackage
-  J.addImport "au.com.helixta.adl.common.db.DbKey"
+  J.addImport "au.com.helixta.adl.custom.DbKey"
   J.addImport "au.com.helixta.adl.common.db.WithDbId"
   J.addImport "au.com.helixta.adl.util.AdlField"
   J.addImport "au.com.helixta.adl.util.DbConversions"
