@@ -50,6 +50,16 @@ stack exec adlc -- cpp \
  -I $ADL_STDLIB_DIR \
  $ADL_STDLIB_DIR/sys/types.adl $ADL_STDLIB_DIR/sys/adlast.adl $ADL_STDLIB_DIR/sys/dynamic.adl
 
+# Generate DENO runtime published at the repo top level
+# to tsc or deno style later
+stack exec adlc -- typescript \
+ --no-overwrite \
+ --verbose \
+ --ts-style deno \
+ -O ../deno/adl-gen \
+ -I $ADL_STDLIB_DIR \
+ $ADL_STDLIB_DIR/sys/types.adl $ADL_STDLIB_DIR/sys/adlast.adl $ADL_STDLIB_DIR/sys/dynamic.adl
+
 # Run some tests for each target language
 stack build generated-tests
 (cd ../typescript/tests; ./run-tests.sh)
