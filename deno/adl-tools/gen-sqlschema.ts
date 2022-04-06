@@ -190,6 +190,7 @@ async function generateCreateSqlSchema(
     }
     for (const f of t.struct.value.fields) {
       const columnName = getColumnName(f);
+      // check length(tableName + "." + columnName) < 64, if not throw error
       const columnType = getColumnType(loadedAdl.resolver, f, dbProfile);
       lines.push({
         code: `${columnName} ${columnType.sqltype}${
@@ -339,6 +340,7 @@ async function generateAlterSqlSchema(
     }
     for (const f of t.struct.value.fields) {
       const columnName = getColumnName(f);
+      // check length(tableName + "." + columnName) < 64, if not throw error
       const columnType = getColumnType(loadedAdl.resolver, f, dbProfile);
       lines.push({
         code: `${columnName} ${columnType.sqltype}`,
