@@ -18,9 +18,6 @@ use genco::prelude::*;
 
 mod astgen;
 
-const OC: &str = "{";
-const CC: &str = "}";
-const DQ: &str = "\"";
 const SP: &str = " ";
 
 pub fn tsgen(opts: &TsOpts) -> anyhow::Result<()> {
@@ -82,6 +79,20 @@ impl TsGenVisitor<'_> {
 struct RttiPayload<'a> {
     mname: String,
     type_params: &'a Vec<String>,
+}
+
+fn gen_doc_comment(t: &mut Tokens<JavaScript>, annotations: &Annotations) {
+    if let Some(ds) = annotations.0.get(&docstring_scoped_name()) {
+        lit(t, "/**\n");
+        for c in ds.as_array().unwrap().iter() {
+            if let Ok(x) = serde_json::to_string(&c.clone()) {
+                // TODO should this be trimmed? or should the output be "*$y" ie no space
+                let y = x[1..x.len() - 1].trim();
+                quote_in! {*t => $[' ']* $(y)$['\r']};
+            }
+        }
+        lit(t, " */\n");
+    }
 }
 
 impl TsGenVisitor<'_> {
@@ -164,9 +175,10 @@ impl TsGenVisitor<'_> {
     }
 }
 
-// fn lit(t: &mut Tokens<JavaScript>, s: &'static str) {
-//     t.append(Item::Literal(ItemStr::Static(s)));
-// }
+fn lit(t: &mut Tokens<JavaScript>, s: &'static str) {
+    t.append(Item::Literal(ItemStr::Static(s)));
+}
+
 fn gen_type_params<'a>(type_params: &'a Vec<String>) -> impl FormatInto<JavaScript> + 'a {
     quote_fn! {
         $(if type_params.len() > 0 => <$(for tp in type_params join (, ) => $tp)>)
@@ -237,20 +249,19 @@ impl TsGenVisitor<'_> {
         // let fnames: &Vec<String> = &m.fields.iter().map(|f| f.name.clone()).collect();
         let te_trs: Vec<TypeExpr<TypeRef>> = m.fields.iter().map(|f| f.type_expr.clone()).collect();
         let fnames = used_type_params(&te_trs);
-        quote_in! { self.t =>
-            export interface $(name)$(gen_type_params_(&fnames, &m.type_params)) $OC$['\r']
-        }
         let mut has_make = true;
-        for f in m.fields.iter() {
-            self.gen_doc_comment(&f.annotations);
-            let rt = rust_type(&f.type_expr).map_err(|s| anyhow!(s))?;
-            has_make = has_make && rt.0;
-            quote_in! { self.t =>
-                $SP$SP$(&f.name): $(rt.1);$['\r']
-            }
-        }
         quote_in! { self.t =>
-            $CC$['\r']$['\n']
+            export interface $(name)$(gen_type_params_(&fnames, &m.type_params)) {$['\r']
+            $(for f in m.fields.iter() =>
+                $(ref t => {
+                    gen_doc_comment(t, &f.annotations);
+                    let rt = rust_type(&f.type_expr).map_err(|s| anyhow!(s))?;
+                    has_make = has_make && rt.0;
+                    quote_in! { *t =>
+                        $SP$SP$(&f.name): $(rt.1);$['\r']
+                    }
+                })
+            )}$['\r']$['\n']
         }
         if has_make {
             quote_in! { self.t =>
