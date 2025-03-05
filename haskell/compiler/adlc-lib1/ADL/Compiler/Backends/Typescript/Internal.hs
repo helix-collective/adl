@@ -3,9 +3,9 @@ module ADL.Compiler.Backends.Typescript.Internal where
 
 import qualified Data.Aeson as JS
 import qualified Data.Aeson.Text as JS
+import qualified Data.Aeson.KeyMap as KM
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Foldable as F
-import qualified Data.HashMap.Lazy as HM
 import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -89,10 +89,16 @@ data ModuleFile = ModuleFile {
   mfCodeGenProfile :: CodeGenProfile
 }
 
-data TSImport = TSImport {
-  iAsName       :: Ident,
-  iModulePath :: [Ident]
-} deriving (Eq, Show, Ord)
+data TSImport
+  = TSImport {
+      iAsName       :: Ident,
+      iModulePath :: [Ident]
+    }
+  | TSImportRaw {
+      iAsName :: Ident,
+      iFrom :: T.Text
+    }
+  deriving (Eq, Show, Ord)
 
 -- data structure to capture all of the details
 -- we need for a field
@@ -510,7 +516,7 @@ literalAst (JS.Number v) | isInteger v = mkUnion "integer" (JS.toJSON v) -- Shou
 literalAst (JS.Null) = mkVoidUnion "null"
 literalAst (JS.Object hm) = mkUnion "object" map
   where
-    map = JS.toJSON [JS.object [("v1",JS.toJSON k),("v2",literalAst v)] | (k,v) <- HM.toList hm]
+    map = JS.toJSON [JS.object [("v1",JS.toJSON k),("v2",literalAst v)] | (k,v) <- KM.toAscList hm]
 literalAst (JS.String s) = mkUnion "string" (JS.toJSON s)
 
 mkMaybe :: Maybe JS.Value -> JS.Value
@@ -581,6 +587,7 @@ genImport tf intoModule TSImport{iAsName=asName, iModulePath=importPath} = ctemp
     relativePath [] ps2 = ps2
     relativePath (p1:ps1) (p2:ps2) | p1 == p2 = relativePath ps1 ps2
     relativePath ps1 ps2 = (map (const "..") ps1) <> ps2
+genImport tf intoModule TSImportRaw{iAsName=asName, iFrom=from} = ctemplate "import * as $1 from \'$2\';" [asName, from]
 
 moduleExt:: TypescriptFlags -> T.Text
 moduleExt tf =

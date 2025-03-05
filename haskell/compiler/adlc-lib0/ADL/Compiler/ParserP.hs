@@ -9,13 +9,14 @@ import Numeric(readHex)
 import Control.Applicative
 
 import qualified Data.Aeson as JSON
+import qualified Data.Aeson.KeyMap as KM
+import qualified Data.Aeson.Key as AKey
 import qualified Data.Scientific as S
 import qualified Data.Map as Map
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Vector as V
 import qualified Data.ByteString as BS
-import qualified Data.HashMap.Strict as HM
 
 import qualified Text.Parsec.Text as P
 import qualified Text.Parsec.Char as P
@@ -87,16 +88,11 @@ typeExpression = do
 
 field :: P.Parser (Field ScopedName)
 field = do
-    anns0 <- annotations
+    anns <- annotations
     te <- typeExpression
     n <- name
     mdefault <- P.optionMaybe (ctoken '=' *> jsonValue)
-    let serializedNameAttr = ScopedName (ModuleName []) "SerializedName"
-    (anns,serializedName) <- case Map.lookup serializedNameAttr anns0 of
-          Nothing -> return (anns0,n)
-          (Just (_,JSON.String s)) -> return (Map.delete serializedNameAttr anns0,s)
-          _ -> fail "need a String value for SerializedName attribute"
-    return (Field n serializedName te mdefault anns)
+    return (Field n n te mdefault anns)
 
 mversion :: P.Parser MVersion
 mversion =   (Just . fromIntegral) <$> (ctoken '#' *> parseInt)
@@ -249,11 +245,11 @@ jsonValue =  p_null <|> p_true <|> p_false <|> p_string <|> p_number <|> p_array
     p_array = JSON.Array . V.fromList <$>
               (ctoken '[' *> P.sepBy jsonValue (ctoken ',') <* ctoken ']')
 
-    p_object = JSON.Object . HM.fromList <$>
+    p_object = JSON.Object . KM.fromList <$>
                (ctoken '{' *> P.sepBy p_field (ctoken ',') <* ctoken '}')
 
-    p_field :: P.Parser (T.Text,JSON.Value)
-    p_field = (,) <$> (p_string0 <* ctoken ':') <*> jsonValue
+    p_field :: P.Parser (KM.Key,JSON.Value)
+    p_field = (,) <$> ((AKey.fromText <$> p_string0) <* ctoken ':') <*> jsonValue
 
 pread :: ReadS a -> P.Parser a
 pread reads = do

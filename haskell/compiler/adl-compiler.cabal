@@ -1,6 +1,6 @@
 cabal-version:       2.4
 name:                adl-compiler
-version:             1.1.6
+version:             1.2.4
 synopsis:            A compiler for the Algebraic Data Language (ADL)
 license:             BSD-3-Clause
 license-file:        ../../LICENSE
@@ -30,6 +30,7 @@ data-files:           lib/adl/adlc/config/cpp.adl
                     , lib/haskell/runtime/ADL/Core/StringMap.hs
                     , lib/haskell/runtime/ADL/Core/TypeToken.hs
                     , lib/haskell/runtime/ADL/Core/Value.hs
+                    , lib/haskell/runtime/ADL/Core/Map.hs
                     , lib/haskell/runtime/ADL/Sys/Adlast.hs
                     , lib/haskell/runtime/ADL/Sys/Types.hs
                     , lib/java/runtime/org/adl/runtime/AdlVoid.java
@@ -47,13 +48,13 @@ data-files:           lib/adl/adlc/config/cpp.adl
                     , lib/java/runtime/org/adl/runtime/Lazy.java
                     , lib/java/runtime/org/adl/runtime/MaybeHelpers.java
                     , lib/java/runtime/org/adl/runtime/TypeToken.java
-                    , lib/typescript/runtime/adl.ts
-                    , lib/typescript/runtime/dynamic.ts
-                    , lib/typescript/runtime/json.ts
-                    , lib/typescript/runtime/sys/adlast.ts
-                    , lib/typescript/runtime/sys/dynamic.ts
-                    , lib/typescript/runtime/sys/types.ts
-                    , lib/typescript/runtime/utils.ts
+                    , lib/typescript/runtime/embedded/adl.ts
+                    , lib/typescript/runtime/embedded/dynamic.ts
+                    , lib/typescript/runtime/embedded/json.ts
+                    , lib/typescript/runtime/embedded/sys/adlast.ts
+                    , lib/typescript/runtime/embedded/sys/dynamic.ts
+                    , lib/typescript/runtime/embedded/sys/types.ts
+                    , lib/typescript/runtime/embedded/utils.ts
                     , lib/rust/runtime/custom/mod.rs
                     , lib/rust/runtime/custom/sys/mod.rs
                     , lib/rust/runtime/custom/sys/types/map.rs
@@ -62,6 +63,7 @@ data-files:           lib/adl/adlc/config/cpp.adl
                     , lib/rust/runtime/custom/sys/types/pair.rs
                     , lib/rust/runtime/custom/sys/types/result.rs
                     , lib/rust/runtime/custom/sys/types/set.rs
+                    , lib/rust/runtime/custom/sys/types/mapentry.rs
                     , lib/rust/runtime/mod.rs
 
 Flag bootstrap
