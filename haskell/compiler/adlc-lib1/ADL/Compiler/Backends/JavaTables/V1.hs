@@ -67,7 +67,7 @@ generateJavaModelV1 jtflags cgp javaPackageFn mod (decl,struct,table,dbTableAnno
       J.addImport "com.google.common.collect.Maps"
       J.addImport "com.google.gson.JsonElement"
       J.addImport "com.google.gson.JsonPrimitive"
-      J.addImport "javax.annotation.Nullable"
+      J.addImport "jakarta.annotation.Nullable"
       J.addImport "java.util.Map"
       J.addImport "java.util.Optional"
       J.addImport "java.util.function.Function"

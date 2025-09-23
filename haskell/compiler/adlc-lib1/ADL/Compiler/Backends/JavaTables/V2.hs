@@ -180,7 +180,7 @@ generateClassCommon dbtable  = do
   J.addImport "au.com.helixta.nofrills.sql.impl.DbResults"
   J.addImport (J.javaClass rtPackage "JsonBindings")
   J.addImport (J.javaClass rtPackage "JsonBinding")
-  J.addImport "javax.annotation.Nullable"
+  J.addImport "jakarta.annotation.Nullable"
   J.addImport "java.sql.SQLException"
   J.addImport "java.util.ArrayList"
   J.addImport "java.util.List"
