@@ -203,7 +203,7 @@ generateCoreStruct codeProfile moduleName javaPackageFn decl struct =  gen
              (if cgp_publicMembers codeProfile then ["public"] else ["private"])
              <>
              (if cgp_mutable codeProfile then [] else ["final"])
-        addField (ctemplate "$1 $2 $3;" [T.intercalate " " modifiers,fd_typeExprStr fd,fd_memberVarName fd])
+        addField (generateDocString (f_annotations (fd_field fd)) <> ctemplate "$1 $2 $3;" [T.intercalate " " modifiers,fd_typeExprStr fd,fd_memberVarName fd])
 
       -- Constructors
       let ctorAllArgs = T.intercalate ", " [fd_typeExprStr fd <> " " <> fd_varName fd | fd <- fieldDetails]
@@ -470,7 +470,7 @@ generateUnion codeProfile moduleName javaPackageFn decl union =  execState gen s
             docStringComment (template "The $1 discriminator type." [className])
             <>
             cblock "public enum Disc" (
-              mconcat [ctemplate "$1$2" [discriminatorName fd,term]
+              mconcat [generateDocString (f_annotations (fd_field fd)) <> ctemplate "$1$2" [discriminatorName fd,term]
                       | (fd,term) <- zip fieldDetails terminators]
                )
       addMethod discdef
@@ -708,7 +708,7 @@ generateEnum codeProfile moduleName javaPackageFn decl union = execState gen sta
       factoryInterface <- addImport (javaClass (cgp_runtimePackage codeProfile) "Factory")
 
       let terminators = replicate (length fieldDetails-1) "," <> [";"]
-      mapM_ addField [ctemplate "$1$2" [discriminatorName fd,term] | (fd,term) <- zip fieldDetails terminators]
+      mapM_ addField [generateDocString (f_annotations (fd_field fd)) <> ctemplate "$1$2" [discriminatorName fd,term] | (fd,term) <- zip fieldDetails terminators]
 
       addMethod $ coverride "public String toString()" (
         cblock "switch(this)" (

@@ -24,6 +24,7 @@ struct B<T>
 
 union U
 {
+   /// An integer
    Int16 f_int;
    String f_string;
    Void f_void;
@@ -31,6 +32,7 @@ union U
 
 union E
 {
+   /// value 1
    Void v1;
    Void v2;
 };
