@@ -24,6 +24,9 @@ public class Test {
 
   /* Members */
 
+  /**
+   * "foo" as a field
+   */
   private Map<String, String> foo;
 
   /* Constructors */

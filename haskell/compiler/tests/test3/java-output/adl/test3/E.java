@@ -18,6 +18,9 @@ public enum E {
 
   /* Members */
 
+  /**
+   * value 1
+   */
   V1,
   V2;
 

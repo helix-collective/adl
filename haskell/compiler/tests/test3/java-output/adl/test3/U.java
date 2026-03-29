@@ -27,6 +27,9 @@ public class U {
    * The U discriminator type.
    */
   public enum Disc {
+    /**
+     * An integer
+     */
     F_INT,
     F_STRING,
     F_VOID

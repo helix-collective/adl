@@ -69,6 +69,9 @@ impl<T> B<T> {
 
 #[derive(Clone,Deserialize,Eq,Hash,PartialEq,Serialize)]
 pub enum U {
+  /**
+   * An integer
+   */
   #[serde(rename="f_int")]
   FInt(i16),
 
@@ -81,6 +84,9 @@ pub enum U {
 
 #[derive(Clone,Deserialize,Eq,Hash,PartialEq,Serialize)]
 pub enum E {
+  /**
+   * value 1
+   */
   #[serde(rename="v1")]
   V1,
 

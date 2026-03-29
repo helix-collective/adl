@@ -104,6 +104,9 @@ export interface U_F_void {
 export type U = U_F_int | U_F_string | U_F_void;
 
 export interface UOpts {
+  /**
+   * An integer
+   */
   f_int: number;
   f_string: string;
   f_void: null;
