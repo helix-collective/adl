@@ -176,12 +176,18 @@ runJava args = do
       , javaMaxLineLength (\s -> (updateCodeGenProfile (\cgp -> cgp{J.cgp_maxLineLength=read s})))
       , javaHeaderComment (\s -> (updateCodeGenProfile (\cgp -> cgp{J.cgp_header=T.pack s})))
       , javaSuppressWarningsAnnotation (\s -> (updateCodeGenProfile (\cgp -> cgp{J.cgp_supressWarnings=T.splitOn "," (T.pack s)})))
+      , javaDefaultOnJsonNull (updateCodeGenProfile (\cgp->cgp{J.cgp_defaultOnJsonNull=True}))
       ]
 
     javaGenerateParcelable ufn =
       Option "" ["parcelable"]
         (NoArg ufn)
         "Generated java code will include android parcellable implementations"
+
+    javaDefaultOnJsonNull ufn =
+      Option "" ["default-on-json-null"]
+        (NoArg ufn)
+        "Deserialize an explicit JSON null as the field's default, rather than failing to parse it"
 
     javaHeaderComment ufn =
       Option "" ["header-comment"]

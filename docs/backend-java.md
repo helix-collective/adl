@@ -17,6 +17,7 @@ Usage: adlc java [OPTION...] files...
           --max-line-length=PACKAGE                The maximum length of the generated code lines
           --header-comment=PACKAGE                 A comment to be placed at the start of each java file
           --suppress-warnings-annotation=WARNINGS  The @SuppressWarnings annotation to be generated (comma separated)
+          --default-on-json-null                   Deserialize an explicit JSON null as the field's default, rather than failing to parse it
 ```
 
 # Generated Code
@@ -130,6 +131,30 @@ src/adl/runtime/Lazy.java
 The runtime itself depends on the following java packages:
 
 * [gson](https://github.com/google/gson)
+
+# Json nulls and default values
+
+A field that declares a default value is read from json only when its key is
+present. An absent key yields the default.
+
+An explicit `null` counts as a present key, so it is passed to the field's json
+binding, and any binding other than `Nullable` rejects it:
+
+```
+struct S {
+  String s = "abc";
+};
+```
+
+`{}` gives `s == "abc"`, while `{"s": null}` is a parse error.
+
+The `--default-on-json-null` flag reads an explicit `null` as an absent key
+instead, so `{"s": null}` also gives `s == "abc"`. It applies to fields whose
+declared type is not `Nullable`; a `Nullable` field has its own reading of
+`null` and keeps it, so `Nullable<String> s = "abc"` continues to give
+`Optional.empty()` for `{"s": null}`.
+
+The flag changes how existing stored json is read, which is why it is opt-in.
 
 # Annotations
 

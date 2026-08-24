@@ -137,6 +137,10 @@ runJavaBackend ipaths mpaths epath updateflags = do
 withJavaOutputPackage :: T.Text -> J.JavaFlags -> J.JavaFlags
 withJavaOutputPackage package flags = flags{J.jf_package=J.javaPackage package}
 
+withJavaDefaultOnJsonNull :: J.JavaFlags -> J.JavaFlags
+withJavaDefaultOnJsonNull flags =
+  flags{J.jf_codeGenProfile=(J.jf_codeGenProfile flags){J.cgp_defaultOnJsonNull=True}}
+
 runJavaBackend1 :: FilePath -> IO CodeGenResult
 runJavaBackend1 mpath = runJavaBackend [ipath,stdsrc] [mpath] epath id
   where
@@ -383,6 +387,20 @@ runTests = do
         `shouldReturn` MatchOutput
     it "doesn't intefer with template parameters in literal strings" $ do
       collectResults (runJavaBackend1 "test30/input/test30.adl")
+        `shouldReturn` MatchOutput
+    it "reads an explicit json null as the default when opted in" $ do
+      collectResults (runJavaBackend
+          ["test31/input",stdsrc] ["test31/input/test31.adl"]
+          "test31/java-output"
+          withJavaDefaultOnJsonNull
+          )
+        `shouldReturn` MatchOutput
+    it "reads an explicit json null as a value by default" $ do
+      collectResults (runJavaBackend
+          ["test31/input",stdsrc] ["test31/input/test31.adl"]
+          "test31/java-output-default"
+          id
+          )
         `shouldReturn` MatchOutput
 
   describe "adlc javascript backend" $ do
