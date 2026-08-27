@@ -141,7 +141,11 @@ data CodeGenProfile = CodeGenProfile {
   cgp_builder :: Bool,
   cgp_parcelable :: Bool,
   cgp_runtimePackage :: JavaPackage,
-  cgp_supressWarnings :: [T.Text]
+  cgp_supressWarnings :: [T.Text],
+  -- | Deserialize an explicit JSON null on a field that has a default as though the field were
+  -- absent, so the default applies. Off by default: enabling it changes the deserialization of
+  -- existing data, from a parse failure to the default value.
+  cgp_defaultOnJsonNull :: Bool
 }
 
 defaultCodeGenProfile = CodeGenProfile {
@@ -154,7 +158,8 @@ defaultCodeGenProfile = CodeGenProfile {
   cgp_builder = True,
   cgp_parcelable = False,
   cgp_runtimePackage = defaultRuntimePackage,
-  cgp_supressWarnings = []
+  cgp_supressWarnings = [],
+  cgp_defaultOnJsonNull = False
 }
 
 defaultRuntimePackage :: JavaPackage
@@ -783,6 +788,14 @@ genFieldDetails f = do
 fd_hasDefault :: FieldDetails -> Bool
 fd_hasDefault fd = isJust (f_default (fd_field fd))
 
+-- | Whether a type expression is an applied Nullable.
+--
+-- Generation runs after @expandModuleTypedefs@, so a Nullable behind a typedef is already this
+-- shape. A newtype over Nullable is not, and gets its own json binding to interpret a null with.
+isNullableTypeExpr :: TypeExpr CResolvedType -> Bool
+isNullableTypeExpr (TypeExpr (RT_Primitive P_Nullable) _) = True
+isNullableTypeExpr _ = False
+
 -- Inside the union implementation we need to be able to cast
 -- from Object to the type of the branch. For a simple enough type
 -- (T) v is enough. When generics are involved we need to call
@@ -987,8 +1000,15 @@ generateStructJson cgp decl struct fieldDetails = do
                             template "$2.fieldFromJson(_obj, \"$1\", $3.get())$4"
                                      [fd_serializedName fd,jsonBindingsI, fd_varName fd,terminator]
                           optionalField fd terminator =
-                            template "_obj.has(\"$1\") ? $2.fieldFromJson(_obj, \"$1\", $3.get()) : $4$5"
-                                     [fd_serializedName fd,jsonBindingsI, fd_varName fd,defValue fd,terminator]
+                            template "$1 ? $3.fieldFromJson(_obj, \"$2\", $4.get()) : $5$6"
+                                     [presenceTest fd,fd_serializedName fd,jsonBindingsI, fd_varName fd,defValue fd,terminator]
+                          -- A Nullable field carries its own meaning for an explicit null, so it
+                          -- keeps reading the value and lets the nullable binding interpret it. Any
+                          -- other field has no use for a null beyond falling back to its default.
+                          presenceTest fd
+                            | cgp_defaultOnJsonNull cgp && not (isNullableTypeExpr (f_type (fd_field fd))) =
+                                template "_obj.has(\"$1\") && !_obj.get(\"$1\").isJsonNull()" [fd_serializedName fd]
+                            | otherwise = template "_obj.has(\"$1\")" [fd_serializedName fd]
                           defValue fd = replaceTypeVarsWithJsonBindings (fd_defValue fd)
                       in
                       clineN

@@ -1,0 +1,19 @@
+module test31 {
+  struct Leaf {
+    String text = "xyz";
+  };
+
+  // Covers each shape the --default-on-json-null guard has to distinguish.
+  struct Defaults {
+    // Guarded: an explicit null has no meaning here beyond "use the default".
+    String withDefault = "abc";
+    Leaf structWithDefault = {};
+
+    // Unguarded: a Nullable interprets an explicit null itself.
+    Nullable<String> nullableNullDefault = null;
+    Nullable<String> nullableNonNullDefault = "abc";
+
+    // Unguarded: no default to fall back to.
+    String required;
+  };
+};
